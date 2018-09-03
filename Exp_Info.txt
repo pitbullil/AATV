@@ -1,0 +1,61 @@
+- Phantom 1 = hair model
+- Phantom 2 = leaf
+- Test made using a continues scan up->down using the stage from z=235 to z=210
+
+- Laser first was at 680nm, at two last tests changed to 730nm
+- Laser power was 40% and at two last tests changed to 100%
+
+Test1 - Hair imaging, good signal but not centered. Good z index is 122
+Test2 - Same, with centered image [THIS IS THE BEST ONE]. Good z index is 121
+Test3 - Leaf, similar setup as with the Hair
+Test4 - Leaf using stronger laser and different wavelength
+Test5 - Leaf with diferent location of the laser (moved the light a bit).
+
+
+
+DAQ sampling freq = 40 MHz
+256 elements
+
+
+
+
+
+
+Analysis code to remove DC and find optimal cut (visualy and by using the Vp-p):
+------------------------------------------------------------------------------------
+
+%% 3D analysis
+L = size(sigMat);
+StCut = 200;  % Pixels to cut from begining
+P = [zeros(StCut, L(2), L(3)) ; sigMat((StCut+1):end,:,:)];
+
+for i = 1: L(3)
+    P(:,:,i) = squeeze(P(:,:,i)) - mean(squeeze(P(:,:,i)),1); % Remove DC from signals
+end
+
+
+figure; % Visualy examine signals
+for i = 100:140
+%     subplot(4,2,i-114);
+    imagesc(squeeze(P(600:1200,:,i))); colorbar; 
+    title([num2str(i)]);
+    pause(0.1);
+end
+
+P_pp = squeeze(range(range(P(400:end,:,:),2),1));
+figure;
+plot(P_pp);% Based on this plot chose z indx.
+%%    
+sigMat = squeeze(P(:,:,122));
+
+% 
+% %%
+% P_tmp = mean(P(:,:,115:122),3);
+% P_tmp = P_tmp - mean(P_tmp,1);
+% figure;
+% imagesc(P_tmp(800:1000,:));
+% sigMat = P_tmp;
+
+
+
+
